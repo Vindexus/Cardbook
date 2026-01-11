@@ -4,7 +4,8 @@
 	"type": "module",
 	"scripts": {
 		"sum": "tsx src/sum.ts",
-		"hex": "tsx src/hex.ts"
+		"hex": "tsx src/hex.ts",
+		"watch": "nodemon --watch src --watch ../../projects --ext ts,pug,css,png --exec tsx src/generate_stories.ts"
 	},
 	"dependencies": {
 		"3": "^2.1.0",
@@ -14,6 +15,7 @@
 		"cleye": "^2.2.1"
 	},
 	"devDependencies": {
+		"nodemon": "^3.1.11",
 		"tsx": "^4.19.0"
 	}
 }

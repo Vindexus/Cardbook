@@ -4,9 +4,9 @@
 	"type": "module",
 	"scripts": {
 		"cli:sum": "pnpm --filter @vinmono/cli sum",
-		"cli:hex": "pnpm --filter @vinmono/cli hex",
+		"cli:watch": "pnpm --filter @vinmono/cli watch",
 		"test": "vitest",
-		"react": "pnpm --filter @vinmono/react dev",
+		"start": "pnpm --filter @vinmono/react storybook",
 		"add-package": "tsx scripts/add_package.ts"
 	},
 	"devDependencies": {
