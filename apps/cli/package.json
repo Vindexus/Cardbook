@@ -5,12 +5,11 @@
 	"scripts": {
 		"sum": "tsx src/sum.ts",
 		"hex": "tsx src/hex.ts",
-		"watch": "nodemon --watch src --watch ../../projects --ext ts,pug,css,png --exec tsx src/generate_stories.ts"
+		"watch": "nodemon --watch src --watch ../../project --ext ts,pug,css,png --exec tsx src/generate_stories.ts"
 	},
 	"dependencies": {
 		"3": "^2.1.0",
 		"5": "^0.0.1",
-		"@vinmono/colors": "workspace:*",
 		"@vinmono/helpers": "workspace:*",
 		"cleye": "^2.2.1"
 	},

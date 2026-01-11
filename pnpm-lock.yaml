@@ -29,9 +29,6 @@ importers:
       '5':
         specifier: ^0.0.1
         version: 0.0.1
-      '@vinmono/colors':
-        specifier: workspace:*
-        version: link:../../packages/colors
       '@vinmono/helpers':
         specifier: workspace:*
         version: link:../../packages/helpers
@@ -54,12 +51,12 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.91.2
         version: 5.91.2(@tanstack/react-query@5.90.16(react@19.2.3))(react@19.2.3)
-      '@vinmono/colors':
-        specifier: workspace:*
-        version: link:../../packages/colors
       '@vinmono/helpers':
         specifier: workspace:*
         version: link:../../packages/helpers
+      '@vinmono/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       react:
         specifier: ^19.2.3
         version: 19.2.3
@@ -92,9 +89,9 @@ importers:
         specifier: ^7.3.0
         version: 7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)
 
-  packages/colors: {}
-
   packages/helpers: {}
+
+  packages/types: {}
 
 packages:
 

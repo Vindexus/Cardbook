@@ -1,0 +1,28 @@
+html {
+	font-size: 32px;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+@import "tailwindcss";
+
+.piece {
+	position: relative;
+	overflow: hidden;
+}
+
+.absolute-center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.piece-inner {
+	display: flex;
+	justify-content: start;
+	align-items: center;
+	flex-direction: column;
+}
