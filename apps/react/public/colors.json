@@ -1,0 +1,12 @@
+{
+	"colors": [
+		{
+			"name": "orange",
+			"hex": "#FFA500"
+		},
+		{
+			"name": "red",
+			"hex": "#FF0000"
+		}
+	]
+}

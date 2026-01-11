@@ -1,0 +1,19 @@
+{
+	"name": "@vinmono/cli",
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"sum": "tsx src/sum.ts",
+		"hex": "tsx src/hex.ts"
+	},
+	"dependencies": {
+		"3": "^2.1.0",
+		"5": "^0.0.1",
+		"@vinmono/colors": "workspace:*",
+		"@vinmono/helpers": "workspace:*",
+		"cleye": "^2.2.1"
+	},
+	"devDependencies": {
+		"tsx": "^4.19.0"
+	}
+}

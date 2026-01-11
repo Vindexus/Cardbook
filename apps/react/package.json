@@ -1,0 +1,29 @@
+{
+	"name": "@vinmono/react",
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"@tanstack/react-query": "^5.90.16",
+		"@tanstack/react-query-devtools": "^5.91.2",
+		"@tanstack/react-router": "^1.144.0",
+		"@tanstack/react-router-devtools": "^1.144.0",
+		"react": "^19.2.3",
+		"react-dom": "^19.2.3",
+		"@vinmono/helpers": "workspace:*",
+		"@vinmono/colors": "workspace:*"
+	},
+	"devDependencies": {
+		"@tailwindcss/vite": "^4.1.18",
+		"@tanstack/router-plugin": "^1.145.4",
+		"@types/react": "^19.2.7",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^5.1.2",
+		"tailwindcss": "^4.1.18",
+		"vite": "^7.3.0"
+	}
+}
