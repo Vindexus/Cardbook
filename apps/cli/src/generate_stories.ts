@@ -18,8 +18,10 @@ run(async () => {
 	console.log("The stories will be saved in", storiesDir);
 	console.log("The project is being loaded from", projectDir);
 
-	const helloWorldStoriesFiles = path.join(storiesDir, "Hello.stories.tsx");
-	const helloWorldComponentFile = path.join(storiesDir, "Hello.tsx");
+	const cardStoriesFiles = path.join(storiesDir, "Card.stories.tsx");
+	const listStoriesFile = path.join(storiesDir, "Lists.stories.tsx");
+	const cardComponentFile = path.join(storiesDir, "Card.tsx");
+	const listComponentFile = path.join(storiesDir, "CardList.tsx");
 
 	const { getData } = await import(dataFile);
 	const { getJSX } = await import(templateFile);
@@ -31,28 +33,46 @@ run(async () => {
 	const keys = Object.keys(data[0]);
 
 	fs.writeFileSync(
-		helloWorldComponentFile,
+		cardComponentFile,
 		`
-export const HelloWorld = (data) => {
+export const Card = (data) => {
 	const { ${keys.join(",")} } = data;
 	return ${jsx}
 }`,
 	);
 
 	fs.writeFileSync(
-		helloWorldStoriesFiles,
+		listComponentFile,
+		`
+import { Card } from './Card';
+
+type Props = {
+		items: {id: string}[]
+}
+
+export const CardList = (data: Props) => {
+	return <div>
+		{data.items.map((item) => {
+			return <Card key={item.id} {...item} />
+		})}
+	</div>
+}`,
+	);
+
+	fs.writeFileSync(
+		cardStoriesFiles,
 		`import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Piece } from "../components/Piece";
 import { Decorator } from "../components/Decorator";
-import { HelloWorld } from "./Hello";
+import { Card } from "./Card";
 
 const meta = {
-	title: 'Cardbook/HelloWorld',
-	component: HelloWorld,
+	title: 'Cardbook/card',
+	component: card,
   decorators: [
     (Story) => <Decorator><Piece><Story /></Piece></Decorator>
   ]
-} satisfies Meta<typeof HelloWorld>;
+} satisfies Meta<typeof card>;
 
 export default meta;
 type Story = StoryObj<typeof meta>
@@ -67,6 +87,46 @@ export const ${id} : Story = {
 }`;
 	})
 	.join("\n\n")}
+`,
+	);
+
+	const items = data.reduce((acc, itemDef, i) => {
+		const num = itemDef.qty ?? 1;
+		const idPrefix = itemDef.name ?? `item${i}`;
+		console.log("qty", num);
+		for (let i = 1; i <= num; i++) {
+			acc.push({
+				id: `${idPrefix}-${i}`,
+				...itemDef,
+			});
+		}
+		return acc;
+	}, []);
+
+	console.log(items);
+
+	fs.writeFileSync(
+		listStoriesFile,
+		`import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Decorator } from "../components/Decorator";
+import { PieceList } from "../components/PieceList";
+
+const meta = {
+	title: 'Cardbook/lists',
+	component: PieceList,
+  decorators: [
+    (Story) => <Decorator><Story /></Decorator>
+  ]
+} satisfies Meta<typeof PieceList>;
+
+export default meta;
+type Story = StoryObj<typeof meta>
+
+export const All : Story = {
+		args: {
+			items: ${JSON.stringify(items)}
+		}
+}
 `,
 	);
 });
