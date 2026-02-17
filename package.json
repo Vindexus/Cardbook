@@ -5,6 +5,7 @@
 	"scripts": {
 		"cli:sum": "pnpm --filter @vinmono/cli sum",
 		"cli:watch": "pnpm --filter @vinmono/cli watch",
+		"cli:screenshot": "pnpm --filter @vinmono/cli screenshot",
 		"test": "vitest",
 		"start": "pnpm --filter @vinmono/react storybook",
 		"add-package": "tsx scripts/add_package.ts"
