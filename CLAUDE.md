@@ -38,6 +38,7 @@ pnpm add-package        # Scaffold a new package
 ### Formatting & Linting
 - Biome for formatting: **tabs** for indentation, **double quotes** for strings
 - Biome handles import organization automatically
+- **No single-line if statements** — always use braces and a newline (e.g. `if (x) { return; }`, not `if (x) return;`)
 
 ### TypeScript
 - Strict mode with `noUncheckedIndexedAccess: true`
@@ -81,8 +82,24 @@ pnpm add-package        # Scaffold a new package
 - Story variants exported as named constants: `export const Primary: Story = { }`
 - Components wrapped in decorators for layout context
 
+### Package File Structure
+- Each subfeature in a package gets its own folder under `src/`
+- The folder name, main file, and spec file all share the same name:
+  ```
+  packages/<pkg>/src/
+    <feature>/
+      index.ts            # re-exports from <feature>.ts
+      <feature>.ts        # implementation
+      <feature>.spec.ts   # tests
+    index.ts              # package barrel exports
+    types.ts              # re-exports types from subfeatures
+  ```
+- The `index.ts` in each folder just re-exports so the folder can be imported by name
+- This convention applies to packages (`packages/`). Apps may use a different structure.
+
 ### Testing
-- Tests use `.test.ts` suffix with Vitest (`describe`, `it`, `expect`)
+- Tests use `.spec.ts` suffix, colocated with their source in the same folder
+- Vitest (`describe`, `it`, `expect`)
 
 ### Comments
 - JSDoc with `@param` for exported utility functions
