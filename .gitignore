@@ -7,3 +7,4 @@ dist
 !.env.example
 *storybook.log
 storybook-static
+.claude/settings.local.json
