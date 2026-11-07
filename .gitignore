@@ -7,4 +7,8 @@ dist
 !.env.example
 *storybook.log
 storybook-static
+<<<<<<< HEAD
 apps/create/src/stories
+=======
+.claude/settings.local.json
+>>>>>>> afe7262 (Share Claude Code rules and skills with the repo)
