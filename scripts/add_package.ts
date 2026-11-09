@@ -31,7 +31,8 @@ const tsconfig = {
 	include: ["src"],
 };
 
-const indexTs = `export * from './types'\nexport {};\n`;
+const indexTs = `export * from "./types";\n`;
+const typesTs = `export {};\n`;
 
 async function main() {
 	await mkdir(srcDir, { recursive: true });
@@ -47,7 +48,7 @@ async function main() {
 	);
 
 	await writeFile(join(srcDir, "index.ts"), indexTs);
-	await writeFile(join(srcDir, "types.ts"), indexTs);
+	await writeFile(join(srcDir, "types.ts"), typesTs);
 
 	console.log(`Created package: ${packageFullName}`);
 	console.log(`\nNext steps:`);
