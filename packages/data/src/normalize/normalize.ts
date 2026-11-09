@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
 	type ComponentType,
 	componentTypeSchema,
+	keyStringSchema,
 	type Piece,
 	pieceSchema,
 	type TemplateDef,
@@ -19,77 +20,178 @@ export interface DataError {
 	message: string;
 }
 
+// Invalid pieces are skipped and reported in `errors` instead of failing the
+// whole project, so one broken piece can't hide all the others
 export type ParseResult =
-	| { success: true; data: ProjectData }
+	| { success: true; data: ProjectData; errors: DataError[] }
 	| { success: false; errors: DataError[] };
 
-const projectSchema = z.object({
-	defaultComponentType: z.string().optional(),
-	componentTypes: z.array(componentTypeSchema),
-	templates: z.array(templateDefSchema),
-	pieces: z.array(z.any()),
-});
+type ParsedPiece = {
+	index: number;
+	piece: Piece;
+	hasExplicitKey: boolean;
+};
 
+const projectSchema = z
+	.object({
+		defaultComponentType: keyStringSchema.optional(),
+		componentTypes: z.array(componentTypeSchema),
+		templates: z.array(templateDefSchema),
+		pieces: z.array(z.unknown()),
+	})
+	.superRefine((project, ctx) => {
+		addDuplicateKeyIssues(project.componentTypes, "componentTypes", ctx);
+		addDuplicateKeyIssues(project.templates, "templates", ctx);
+	});
+
+/**
+ * Validates raw project input, applies defaults, and gives every piece a unique key.
+ * @param raw - Untrusted project input, such as parsed JSON
+ */
 export function parseProjectData(raw: unknown): ParseResult {
 	const projectResult = projectSchema.safeParse(raw);
 	if (!projectResult.success) {
 		return {
 			success: false,
-			errors: projectResult.error.issues.map((issue) => ({
-				path: issue.path.join("."),
-				message: issue.message,
-			})),
+			errors: toDataErrors(projectResult.error.issues, ""),
 		};
 	}
 
 	const project = projectResult.data;
 	const errors: DataError[] = [];
-	const pieces: Piece[] = [];
-	const keyCounts = new Map<string, number>();
+	const parsedPieces: ParsedPiece[] = [];
 
-	for (let i = 0; i < project.pieces.length; i++) {
-		const rawPiece = project.pieces[i];
-
-		// Apply defaultComponentType if piece doesn't have one
-		const pieceInput =
-			!rawPiece.componentType && project.defaultComponentType
-				? { ...rawPiece, componentType: project.defaultComponentType }
-				: rawPiece;
-
+	project.pieces.forEach((rawPiece, index) => {
+		const pieceInput = withDefaultComponentType(
+			rawPiece,
+			project.defaultComponentType,
+		);
 		const result = pieceSchema.safeParse(pieceInput);
 		if (!result.success) {
-			for (const issue of result.error.issues) {
-				errors.push({
-					path: `pieces.${i}.${issue.path.join(".")}`,
-					message: issue.message,
-				});
-			}
-			continue;
+			errors.push(...toDataErrors(result.error.issues, `pieces.${index}`));
+			return;
 		}
 
-		const piece = result.data as Piece;
+		const hasExplicitKey = isRecord(rawPiece) && rawPiece.key !== undefined;
+		parsedPieces.push({ index, piece: result.data, hasExplicitKey });
+	});
 
-		// Ensure unique keys
-		const baseKey = piece.key;
-		const count = keyCounts.get(baseKey) ?? 0;
-		if (count > 0) {
-			piece.key = `${baseKey}_${count}`;
-		}
-		keyCounts.set(baseKey, count + 1);
-
-		pieces.push(piece);
-	}
-
-	if (errors.length > 0) {
-		return { success: false, errors };
-	}
+	const keyed = assignUniqueKeys(parsedPieces);
+	errors.push(...keyed.errors);
 
 	return {
 		success: true,
 		data: {
 			componentTypes: project.componentTypes,
 			templates: project.templates,
-			pieces,
+			pieces: keyed.pieces,
 		},
+		errors,
 	};
+}
+
+function assignUniqueKeys(parsedPieces: ParsedPiece[]): {
+	pieces: Piece[];
+	errors: DataError[];
+} {
+	const usedKeys = new Set<string>();
+	const rejected = new Set<ParsedPiece>();
+	const errors: DataError[] = [];
+
+	// Explicit keys are claimed first, so a generated key never takes one
+	// that's written later in the list
+	for (const parsed of parsedPieces) {
+		if (!parsed.hasExplicitKey) {
+			continue;
+		}
+
+		if (usedKeys.has(parsed.piece.key)) {
+			rejected.add(parsed);
+			errors.push({
+				path: `pieces.${parsed.index}.key`,
+				message: `Duplicate key "${parsed.piece.key}"`,
+			});
+			continue;
+		}
+
+		usedKeys.add(parsed.piece.key);
+	}
+
+	const pieces: Piece[] = [];
+	for (const parsed of parsedPieces) {
+		if (rejected.has(parsed)) {
+			continue;
+		}
+
+		if (parsed.hasExplicitKey) {
+			pieces.push(parsed.piece);
+			continue;
+		}
+
+		const key = nextUnusedKey(parsed.piece.key, usedKeys);
+		usedKeys.add(key);
+		pieces.push({ ...parsed.piece, key });
+	}
+
+	return { pieces, errors };
+}
+
+function nextUnusedKey(baseKey: string, usedKeys: Set<string>): string {
+	if (!usedKeys.has(baseKey)) {
+		return baseKey;
+	}
+
+	let copyNumber = 2;
+	while (usedKeys.has(withCopySuffix(baseKey, copyNumber))) {
+		copyNumber++;
+	}
+
+	return withCopySuffix(baseKey, copyNumber);
+}
+
+function withCopySuffix(baseKey: string, copyNumber: number): string {
+	return `${baseKey}_${String(copyNumber).padStart(3, "0")}`;
+}
+
+function withDefaultComponentType(
+	rawPiece: unknown,
+	defaultComponentType: string | undefined,
+): unknown {
+	const needsDefault =
+		isRecord(rawPiece) && rawPiece.componentType === undefined;
+
+	if (!needsDefault || defaultComponentType === undefined) {
+		return rawPiece;
+	}
+
+	return { ...rawPiece, componentType: defaultComponentType };
+}
+
+function addDuplicateKeyIssues(
+	items: { key: string }[],
+	field: string,
+	ctx: z.RefinementCtx,
+) {
+	const seenKeys = new Set<string>();
+	items.forEach((item, index) => {
+		if (seenKeys.has(item.key)) {
+			ctx.addIssue({
+				code: "custom",
+				path: [field, index, "key"],
+				message: `Duplicate key "${item.key}"`,
+			});
+		}
+		seenKeys.add(item.key);
+	});
+}
+
+function toDataErrors(issues: z.ZodIssue[], pathPrefix: string): DataError[] {
+	return issues.map((issue) => ({
+		path: [pathPrefix, ...issue.path].filter((part) => part !== "").join("."),
+		message: issue.message,
+	}));
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null && !Array.isArray(value);
 }

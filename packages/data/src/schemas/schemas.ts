@@ -48,9 +48,16 @@ export const trblSchema = z
 
 export const componentTypeSchema = z.object({
 	key: keyStringSchema,
-	widthPX: z.number().int(),
-	heightPX: z.number().int(),
+	widthPX: z.number().int().positive(),
+	heightPX: z.number().int().positive(),
 	trims: z.array(trblSchema).default([]),
+});
+
+// Pieces aren't scoped resources, so no "@" or "/", but they can start with a
+// number because keys generated from names like "10 Gold" do
+export const pieceKeySchema = z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/, {
+	message:
+		"must start with a letter or number, then use only letters, numbers, underscores, or dashes",
 });
 
 export const pieceSchema = z
@@ -58,19 +65,35 @@ export const pieceSchema = z
 		componentType: keyStringSchema,
 		template: keyStringSchema,
 		qty: z.number().int().positive().default(1),
-		key: z.string().optional(),
+		key: pieceKeySchema.optional(),
 		name: z.string().optional(),
 		data: z.record(z.string(), z.any()).default({}),
 	})
-	.superRefine((obj, ctx) => {
-		if (!obj.key && !obj.name) {
+	.transform((piece, ctx) => {
+		if (piece.key !== undefined) {
+			return { ...piece, key: piece.key };
+		}
+
+		if (piece.name === undefined) {
 			ctx.addIssue({
 				code: "custom",
+				path: ["key"],
 				message: "Either key or name must be provided",
 			});
-		} else if (!obj.key && obj.name) {
-			obj.key = slugify(obj.name);
+			return z.NEVER;
 		}
+
+		const generatedKey = slugify(piece.name);
+		if (!pieceKeySchema.safeParse(generatedKey).success) {
+			ctx.addIssue({
+				code: "custom",
+				path: ["name"],
+				message: `Can't make a key from the name "${piece.name}". Add a key, or use letters or numbers in the name`,
+			});
+			return z.NEVER;
+		}
+
+		return { ...piece, key: generatedKey };
 	});
 
 // Input/output types
@@ -81,9 +104,7 @@ export type ComponentTypeInput = z.input<typeof componentTypeSchema>;
 export type ComponentType = z.output<typeof componentTypeSchema>;
 
 export type PieceInput = z.input<typeof pieceSchema>;
-export type Piece = Omit<z.output<typeof pieceSchema>, "key"> & {
-	key: string;
-};
+export type Piece = z.output<typeof pieceSchema>;
 
 export type TemplateDefInput = z.input<typeof templateDefSchema>;
 export type TemplateDef = z.output<typeof templateDefSchema>;

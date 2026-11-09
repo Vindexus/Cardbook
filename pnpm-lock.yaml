@@ -91,6 +91,9 @@ importers:
       '@vinforge/helpers':
         specifier: workspace:*
         version: link:../helpers
+      '@vinforge/types':
+        specifier: workspace:*
+        version: link:../types
       zod:
         specifier: ^3.25.67
         version: 3.25.76
