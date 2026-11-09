@@ -54,7 +54,6 @@ Run these from the repo root with `pnpm <script>`.
 | `test` | Runs Vitest in watch mode across the workspace. |
 | `cli:watch` | Watches `project/` and the CLI source, and regenerates the Storybook stories on every change. |
 | `cli:screenshot` | Screenshots the card list story with Puppeteer and saves it to `exports/`. Storybook must already be running. |
-| `cli:sum` | Runs `apps/cli/src/sum.ts`, which no longer exists. Likely leftover. |
 | `add-package <name>` | Scaffolds `packages/<name>` with a `package.json`, `tsconfig.json`, `src/index.ts`, and `src/types.ts`. |
 
 A typical loop is `pnpm start` in one terminal and `pnpm cli:watch` in another, then edit the files in `project/`.
