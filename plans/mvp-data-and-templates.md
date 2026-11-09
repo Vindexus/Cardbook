@@ -122,7 +122,7 @@ The old test files provide a great starting point. Here's what to bring over:
 
 ---
 
-## Milestone 1: Data Package (`@vinmono/data`)
+## Milestone 1: Data Package (`@vinforge/data`)
 
 ### Goal
 
@@ -172,14 +172,14 @@ packages/data/
 
 ### Done when
 
-- [ ] `@vinmono/data` package exists with Zod schemas
+- [ ] `@vinforge/data` package exists with Zod schemas
 - [ ] `parseProjectData(raw: unknown)` returns validated + normalized data or structured errors
 - [ ] All test cases pass (ported + new)
 - [ ] The existing `project/data.ts` sample can be expressed in the new format
 
 ---
 
-## Milestone 2: Template Package (`@vinmono/templater`)
+## Milestone 2: Template Package (`@vinforge/templater`)
 
 ### Goal
 
@@ -258,7 +258,7 @@ packages/templater/
 
 ### Done when
 
-- [ ] `@vinmono/templater` package exists
+- [ ] `@vinforge/templater` package exists
 - [ ] `createTemplater(config)` works with templates, globalData, partials, helpers
 - [ ] `templater.getHTML(templateName, data)` returns HTML or TemplateError
 - [ ] The PUG subset handles elements, classes, IDs, text, dynamic text, nesting (ported from old code)
@@ -276,7 +276,7 @@ Prove the two packages work together end-to-end: raw project JSON → validated 
 
 ### Shape of the work
 
-This might live in a small integration test file, or in a new `@vinmono/core` package that combines data + templater. Or it might just be test cases that import both packages.
+This might live in a small integration test file, or in a new `@vinforge/core` package that combines data + templater. Or it might just be test cases that import both packages.
 
 ### Test fixture: sample project
 
@@ -287,7 +287,7 @@ Also create a simpler fantasy game fixture with the examples from the overview d
 ### Test cases
 
 - Load a sample project JSON with 3-5 pieces across 2 templates
-- Parse and validate with `@vinmono/data`
+- Parse and validate with `@vinforge/data`
 - Create a templater with the project's templates, globals, partials
 - Render each piece → get HTML or error
 - One piece has intentionally bad data → produces error, others still render
@@ -307,7 +307,7 @@ Also create a simpler fantasy game fixture with the examples from the overview d
 
 These don't need answers before starting, but should be resolved during development:
 
-1. **Should `@vinmono/data` own the ComponentType definitions, or is that a separate package?** ComponentTypes feel like they belong with data, but `@core/poker` etc. are resources that need the resolution system. The old code puts defaults in `src/cc/defaults/` — we could do similar with a `@vinmono/core-resources` package or just a `defaults/` dir within data.
+1. **Should `@vinforge/data` own the ComponentType definitions, or is that a separate package?** ComponentTypes feel like they belong with data, but `@core/poker` etc. are resources that need the resolution system. The old code puts defaults in `src/cc/defaults/` — we could do similar with a `@vinforge/core-resources` package or just a `defaults/` dir within data.
 
 2. **Does the templater parse on every `getHTML` call, or cache compiled templates?** Probably cache — the old code compiles via `Handlebars.compile()` which returns a reusable function. Keep this pattern: compile once, call with different data many times.
 
@@ -315,6 +315,6 @@ These don't need answers before starting, but should be resolved during developm
 
 4. **What's the right level of Handlebars support for MVP?** `{{#each}}` blocks are really useful for cards with lists (abilities, types). The old poker card template uses `{{#each icons}}` — include this in MVP.
 
-5. **Keep `packages/helpers/strings.ts` as a shared dep.** The templater should import `splitBySpaces`, `countAndRemoveIndentation` from `@vinmono/helpers` rather than duplicating. This is already how the old code works (`import from "../lib/string-helpers"`).
+5. **Keep `packages/helpers/strings.ts` as a shared dep.** The templater should import `splitBySpaces`, `countAndRemoveIndentation` from `@vinforge/helpers` rather than duplicating. This is already how the old code works (`import from "../lib/string-helpers"`).
 
 6. **Handlebars isolation.** The old code uses global `Handlebars.registerHelper()`. The new code must use `Handlebars.create()` for per-templater-instance isolation. Verify this works with partials too.

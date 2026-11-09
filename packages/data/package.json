@@ -1,5 +1,5 @@
 {
-  "name": "@vinmono/data",
+  "name": "@vinforge/data",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -7,6 +7,6 @@
   },
   "dependencies": {
     "zod": "^3.25.67",
-    "@vinmono/helpers": "workspace:*"
+    "@vinforge/helpers": "workspace:*"
   }
 }

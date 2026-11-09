@@ -1,5 +1,5 @@
 {
-	"name": "@vinmono/cli",
+	"name": "@vinforge/cli",
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
@@ -7,7 +7,7 @@
 		"screenshot": "tsx src/screenshotter.ts"
 	},
 	"dependencies": {
-		"@vinmono/helpers": "workspace:*",
+		"@vinforge/helpers": "workspace:*",
 		"cleye": "^2.2.1",
 		"puppeteer": "^24.34.0"
 	},

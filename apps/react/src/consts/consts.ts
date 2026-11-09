@@ -1,4 +1,4 @@
-import type { PieceType } from "@vinmono/types";
+import type { PieceType } from "@vinforge/types";
 // Eventually this would be something that is configurable, but we hardcode it for now
 export const pieceType: PieceType = {
 	widthPX: 850,

@@ -1,12 +1,12 @@
 {
-	"name": "vinmono",
+	"name": "vinforge",
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"cli:watch": "pnpm --filter @vinmono/cli watch",
-		"cli:screenshot": "pnpm --filter @vinmono/cli screenshot",
+		"cli:watch": "pnpm --filter @vinforge/cli watch",
+		"cli:screenshot": "pnpm --filter @vinforge/cli screenshot",
 		"test": "vitest",
-		"start": "pnpm --filter @vinmono/react storybook",
+		"start": "pnpm --filter @vinforge/react storybook",
 		"add-package": "tsx scripts/add_package.ts"
 	},
 	"devDependencies": {

@@ -1,4 +1,4 @@
-import { slugify } from "@vinmono/helpers";
+import { slugify } from "@vinforge/helpers";
 import { z } from "zod";
 
 export const keyStringSchema = z

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Cardbook (`@vinmono`) is a card design system for generating, visualizing, and managing physical card designs with trim specifications, bleeds, and edges. It uses Storybook for component preview and Puppeteer for screenshot generation.
+Cardbook (`@vinforge`) is a card design system for generating, visualizing, and managing physical card designs with trim specifications, bleeds, and edges. It uses Storybook for component preview and Puppeteer for screenshot generation.
 
 ## Monorepo Structure
 
@@ -49,7 +49,7 @@ pnpm add-package        # Scaffold a new package
 
 ### Imports
 - Prefer named imports over default imports
-- Import order: Node built-ins → third-party packages → `@vinmono/` packages → relative imports
+- Import order: Node built-ins → third-party packages → `@vinforge/` packages → relative imports
 - Use `workspace:*` protocol for internal package dependencies
 
 ### Exports
@@ -61,7 +61,7 @@ pnpm add-package        # Scaffold a new package
 - **Files:** PascalCase for React components (`Card.tsx`, `PieceList.tsx`), camelCase for utilities (`strings.ts`, `timeout.ts`)
 - **Variables/functions:** camelCase
 - **Types/interfaces:** PascalCase, use `Props` suffix for component props (e.g. `ButtonProps`)
-- **Packages:** `@vinmono/` namespace
+- **Packages:** `@vinforge/` namespace
 
 ### React Components
 - Arrow function components with `React.FC<Props>` typing

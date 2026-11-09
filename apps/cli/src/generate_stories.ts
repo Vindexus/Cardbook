@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { slugify } from "@vinmono/helpers";
+import { slugify } from "@vinforge/helpers";
 import { run } from "./utils/run";
 
 const __filename = fileURLToPath(import.meta.url);

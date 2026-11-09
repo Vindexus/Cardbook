@@ -436,7 +436,7 @@ TemplaterConfig {
 
 The interface is intentionally loose — we expect to discover new needs as the system grows. The key constraint is that `getHTML` returns either HTML or a structured error, never throws.
 
-**The templater is a standalone package** (`@vinmono/templater` or similar) with no React or browser dependencies. It's pure TypeScript that takes strings and data and returns HTML strings. It could be used in any context: a React app, an Express server doing SSR, a CLI tool, a Node script, etc.
+**The templater is a standalone package** (`@vinforge/templater` or similar) with no React or browser dependencies. It's pure TypeScript that takes strings and data and returns HTML strings. It could be used in any context: a React app, an Express server doing SSR, a CLI tool, a Node script, etc.
 
 **React integration** is a separate concern. The React app creates a templater instance and makes it available (likely via context). Components call `getHTML` per-card during render. If a card's data or template is broken, `getHTML` returns a `TemplateError` and the component renders an error state instead of crashing the whole list. This means rendering 100 cards where the 75th has bad data shows 74 good cards + 1 error card + 25 more good cards.
 
