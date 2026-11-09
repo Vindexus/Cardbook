@@ -1,0 +1,12 @@
+{
+	"name": "@vinforge/templater",
+	"version": "0.0.0",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"dependencies": {
+		"@vinforge/helpers": "workspace:*",
+		"@vinforge/types": "workspace:*"
+	}
+}

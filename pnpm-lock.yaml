@@ -100,6 +100,15 @@ importers:
 
   packages/helpers: {}
 
+  packages/templater:
+    dependencies:
+      '@vinforge/helpers':
+        specifier: workspace:*
+        version: link:../helpers
+      '@vinforge/types':
+        specifier: workspace:*
+        version: link:../types
+
   packages/types: {}
 
 packages:
