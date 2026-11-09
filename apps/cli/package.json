@@ -3,8 +3,6 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"sum": "tsx src/sum.ts",
-		"hex": "tsx src/hex.ts",
 		"watch": "nodemon --watch src --watch ../../project --ext ts,pug,css,png --exec tsx src/generate_stories.ts",
 		"screenshot": "tsx src/screenshotter.ts"
 	},
