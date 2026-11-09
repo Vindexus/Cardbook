@@ -1,3 +1,5 @@
+export * from "./test-case";
+
 export type PieceDef = {
 	name: string;
 	// for later: layout, maybe data, component type, etc etc
