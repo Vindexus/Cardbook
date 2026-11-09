@@ -67,7 +67,7 @@ New:
    - Use a lighter expression evaluator
    - This is a key decision for Milestone 2
 
-2. **`directVar` wraps in `{{markdown varName}}`** — the old code always wraps `= varName` in a markdown helper. The new design should make this configurable or at least use a different default (plain interpolation, with markdown as an opt-in helper).
+2. **`directVar` wraps in `{{markdown varName}}`** — the old code always wraps `= varName` in a markdown helper. **Decided:** `= varName` is plain interpolation. `.title= name` is the same as `.title` with `{{name}}` nested inside it, and compiles to `<div class="title">{{name}}</div>`. Markdown is opt-in via `{{markdown name}}`.
 
 3. **Error handling** — old code throws on bad templates. New code should return structured errors.
 
@@ -217,7 +217,12 @@ A standalone package (no React, no browser dependencies) that takes template str
   - **Keep Handlebars (recommended for MVP):** Use `Handlebars.create()` for per-instance isolation. Gets us `{{var}}`, `{{helper arg}}`, `{{> partial}}`, `{{#each}}` for free. Battle-tested.
   - **Replace Handlebars:** More control, lighter, but significant work. Do this later if Handlebars becomes a limitation.
 
-- **`directVar` and the `markdown` helper** — Old code wraps `= varName` in `{{markdown varName}}` which converts `**bold**` and `*italic*`. Decision: keep this default behavior? Or make `=` do plain interpolation and let users opt into markdown via `{{markdown varName}}` explicitly?
+- **`directVar` and the `markdown` helper** — **Decided:** `.title= name` is the same as:
+  ```
+  .title
+    {{name}}
+  ```
+  It compiles to plain `{{name}}`, which Handlebars HTML-escapes. Markdown (`**bold**`, `*italic*`) is opt-in by writing `{{markdown name}}`. If a `markdown` helper is ported, it must escape its input with `Handlebars.escapeExpression` before adding tags. The old helper returned a `SafeString` without escaping, so any HTML in card data was inserted raw.
 
 - **Expression resolution in data values** — card data like `"description": "Restore {{_.healBig}} health"`. This means running Handlebars on data values before passing them to the template. The old code doesn't do this — it's new functionality.
 
