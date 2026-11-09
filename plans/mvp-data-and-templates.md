@@ -131,7 +131,7 @@ A package that takes raw project input (JSON) and produces validated, normalized
 ### What to figure out
 
 - **Validation strategy** — Zod is already installed and the old code uses it well. Port the schemas, adapt to new shape.
-- **ID generation** — Old code uses `slugify(name)` via `superRefine`. Keep this. For uniqueness when multiple pieces have the same name, append an index suffix (e.g. `health_potion`, `health_potion_2`).
+- **ID generation** — Old code uses `slugify(name)` via `superRefine`. Keep this. For uniqueness when multiple pieces have the same name, append an index suffix (e.g. `health_potion`, `health_potion_002`).
 - **Defaults** — `qty` defaults to 1 (old code does this). Consider project-level `defaultComponentType` so you don't repeat `"@core/poker"` on every piece.
 - **The `@scope/name` resolution** — Validate syntax with the existing `keyStringSchema` regex. Don't resolve references — that's a separate concern.
 
@@ -140,14 +140,29 @@ A package that takes raw project input (JSON) and produces validated, normalized
 ```
 packages/data/
   src/
-    index.ts              // public API: parseProjectData()
-    schemas.ts            // Zod schemas (port from old schema.ts)
-    normalize.ts          // apply defaults, generate IDs
-    types.ts              // TypeScript types (inferred from Zod)
-  src/__tests__/
-    schemas.test.ts       // port from old schema.test.ts + new cases
-    normalize.test.ts     // defaults, IDs, uniqueness
+    schemas/
+      index.ts            // re-exports schemas.ts
+      schemas.ts          // Zod schemas (port from old schema.ts)
+      schemas.spec.ts     // port from old schema.test.ts + new cases
+    normalize/
+      index.ts            // re-exports normalize.ts
+      normalize.ts        // parseProjectData(): apply defaults, generate keys
+      normalize.spec.ts   // defaults, keys, uniqueness, error reporting
+    index.ts              // public API
+    types.ts              // re-exports types from subfeatures
 ```
+
+### Decisions made
+
+- **Partial success** — Project-level problems (bad shape, invalid `defaultComponentType`, duplicate component type or template keys) fail the whole parse. An invalid piece is skipped and reported in `errors`, and the valid pieces are still returned, so one broken card can't hide the rest:
+  ```ts
+  type ParseResult =
+    | { success: true; data: ProjectData; errors: DataError[] }
+    | { success: false; errors: DataError[] };
+  ```
+- **Piece keys** — Explicit keys are claimed first. A duplicate explicit key is an error. Keys generated from names get zero-padded suffixes (`_002`, `_003`) and never take a key that's already used.
+- **`pieceKeySchema`** — Piece keys aren't scoped resources, so they use their own rule (`^[A-Za-z0-9][A-Za-z0-9_-]*$`): no `@` or `/`, but they can start with a number, so a name like "10 Gold" works.
+- **Tests** — Written as tables of cases using the shared `TestCase` type from `@vinforge/types`.
 
 ### Test cases to write first (TDD)
 
@@ -172,10 +187,10 @@ packages/data/
 
 ### Done when
 
-- [ ] `@vinforge/data` package exists with Zod schemas
-- [ ] `parseProjectData(raw: unknown)` returns validated + normalized data or structured errors
-- [ ] All test cases pass (ported + new)
-- [ ] The existing `project/data.ts` sample can be expressed in the new format
+- [x] `@vinforge/data` package exists with Zod schemas
+- [x] `parseProjectData(raw: unknown)` returns validated + normalized data or structured errors
+- [x] All test cases pass (ported + new)
+- [x] The existing `project/data.ts` sample can be expressed in the new format (covered by a test case; `project/data.ts` itself still uses the old shape until the CLI is wired up)
 
 ---
 
@@ -213,19 +228,30 @@ A standalone package (no React, no browser dependencies) that takes template str
 ```
 packages/templater/
   src/
-    index.ts              // public API: createTemplater()
-    parser.ts             // PUG-style → Handlebars string (port convertMarkupToHandlebarsTemplate)
-    parseMarkupLine.ts    // line-level parser (port from old code)
-    elements.ts           // element helpers (port getPieceElement, elementToOpenHTML, etc)
-    errors.ts             // TemplateError types
-    types.ts              // TemplaterConfig, ParsedLine, Element, etc.
-  src/__tests__/
-    parseMarkupLine.test.ts  // port from old templates.test.ts
-    elements.test.ts         // port element open/close tests
-    parser.test.ts           // port full compilation tests
-    templater.test.ts        // new: createTemplater → getHTML integration
-    errors.test.ts           // new: error cases
+    parseMarkupLine/
+      index.ts
+      parseMarkupLine.ts       // line-level parser (port from old code)
+      parseMarkupLine.spec.ts  // port from old templates.test.ts
+    elements/
+      index.ts
+      elements.ts              // element helpers (port getPieceElement, elementToOpenHTML, etc)
+      elements.spec.ts         // port element open/close tests
+    parser/
+      index.ts
+      parser.ts                // PUG-style → Handlebars string (port convertMarkupToHandlebarsTemplate)
+      parser.spec.ts           // port full compilation tests
+    templater/
+      index.ts
+      templater.ts             // createTemplater(), getHTML()
+      templater.spec.ts        // new: createTemplater → getHTML integration, plus error cases
+    errors/
+      index.ts
+      errors.ts                // TemplateError types
+    index.ts                   // public API: createTemplater()
+    types.ts                   // re-exports types (TemplaterConfig, ParsedLine, Element, etc.)
 ```
+
+Tests are tables of cases using the shared `TestCase` type from `@vinforge/types`.
 
 ### Test cases to write first (TDD)
 
