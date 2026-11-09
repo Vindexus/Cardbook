@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countAndRemoveIndentation, splitBySpaces } from "./string-helpers.ts";
+import { countAndRemoveIndentation, splitBySpaces } from "./strings";
 
 describe("splitBySpaces", () => {
 	it("should split basic space-separated words", () => {
