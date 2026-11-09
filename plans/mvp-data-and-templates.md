@@ -164,7 +164,7 @@ packages/data/
 - **`pieceKeySchema`** — Piece keys aren't scoped resources, so they use their own rule (`^[A-Za-z0-9][A-Za-z0-9_-]*$`): no `@` or `/`, but they can start with a number, so a name like "10 Gold" works.
 - **Tests** — Written as tables of cases using the shared `TestCase` type from `@vinforge/types`.
 
-### Test cases to write first (TDD)
+### Test cases (written after the code, then refined back and forth)
 
 **Ported from old codebase (adapt to new schema shape):**
 - TRBL parsing: `10` → `{top:10, right:10, bottom:10, left:10}`
@@ -258,7 +258,7 @@ packages/templater/
 
 Tests are tables of cases using the shared `TestCase` type from `@vinforge/types`.
 
-### Test cases to write first (TDD)
+### Test cases (written after the code, then refined back and forth)
 
 **Ported from old `templates.test.ts`:**
 - `parseMarkupLine("div")` → content type, `content: "div"`
