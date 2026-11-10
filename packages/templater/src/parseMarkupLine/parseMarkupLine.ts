@@ -112,7 +112,7 @@ export function parseMarkupLine(indentedLine: string): ParsedLine {
 export function parseMarkupLines(template: string): NumberedLine[] {
 	const numberedLines: NumberedLine[] = [];
 
-	template.split("\n").forEach((rawLine, index) => {
+	template.split(/\r?\n/).forEach((rawLine, index) => {
 		const lineNumber = index + 1;
 		const trimmed = rawLine.trim();
 		// TODO: Skipping blank lines may break content where people want empty lines for paragraphs

@@ -224,9 +224,19 @@ A standalone package (no React, no browser dependencies) that takes template str
   ```
   It compiles to plain `{{name}}`, which Handlebars HTML-escapes. Markdown (`**bold**`, `*italic*`) is opt-in by writing `{{markdown name}}`. If a `markdown` helper is ported, it must escape its input with `Handlebars.escapeExpression` before adding tags. The old helper returned a `SafeString` without escaping, so any HTML in card data was inserted raw.
 
-- **Expression resolution in data values** — card data like `"description": "Restore {{_.healBig}} health"`. This means running Handlebars on data values before passing them to the template. The old code doesn't do this — it's new functionality.
+- **Expression resolution in data values** — card data like `"description": "Restore {{_.healBig}} health"`. This means running Handlebars on data values before passing them to the template. The old code doesn't do this — it's new functionality. **Decided:** not in the MVP.
 
 - **Error handling** — Old code throws. New code should catch and return `TemplateError`. Wrap the Handlebars compile/render calls in try/catch.
+
+### Decisions made
+
+- **Handlebars** — Kept, with one `Handlebars.create()` instance per templater.
+- **Missing variables** — A render error, not a template error. Templates compile in Handlebars strict mode, so `{{name}}` with no `name` fails that one piece's render, and the app can show the piece as broken and add it to the global error list. `{{#if}}` and `{{#each}}` still allow missing fields, so optional fields work.
+- **Results** — `getHTML` returns `{ success: true; data: { html, classes, styles } } | { success: false; error: TemplateError }`. `TemplateError.kind` is `unknownTemplate`, `invalidTemplate` (bad markup or Handlebars syntax), or `renderFailed`.
+- **Partials** — Written in the same markup as templates. A partial with invalid markup only fails the templates that use it.
+- **`_classes`** — One unindented `_classes` line, taken as written (space-separated, Handlebars allowed). Dots are no longer turned into spaces, so `{{card.suit}}` works.
+- **`style`** — A line that is exactly `style` starts the CSS section. The old code split on the word anywhere.
+- **Globals** — Available under `_`, which is reserved in piece data.
 
 ### Shape of the work
 
@@ -245,6 +255,10 @@ packages/templater/
       index.ts
       parser.ts                // PUG-style → Handlebars string (port convertMarkupToHandlebarsTemplate)
       parser.spec.ts           // port full compilation tests
+    parseTemplate/
+      index.ts
+      parseTemplate.ts         // splits out _classes and style, compiles the markup
+      parseTemplate.spec.ts
     templater/
       index.ts
       templater.ts             // createTemplater(), getHTML()
@@ -269,7 +283,6 @@ Tests are tables of cases using the shared `TestCase` type from `@vinforge/types
 - `parseMarkupLine("#header.right.bold My name is {{name}}")` → element type with content
 - `parseMarkupLine(".header#header")` → throws "must start with #"
 - `elementToOpenHTML({id: "header", cssClasses: ["right", "bold"]})` → `<div id="header" class="right bold">`
-- `elementToCloseHTML(...)` → closing div with comment
 - Full template: `.header\n\t.title= name\n\t.qty x{{qty}}` → correct nested HTML
 - Excessive indentation → throws error
 - Two root elements → both close properly
@@ -284,18 +297,18 @@ Tests are tables of cases using the shared `TestCase` type from `@vinforge/types
 - `setGlobalData(...)` then re-render → new globals used
 - Unknown template name → `TemplateError`
 - Syntax error in template → `TemplateError` (not thrown)
-- Missing variable → empty string or `TemplateError` (decide which)
-- Data value `"Restore {{_.healBig}} health"` with globalData `{healBig: 50}` → `"Restore 50 health"`
+- Missing variable → `renderFailed` `TemplateError`
 
 ### Done when
 
-- [ ] `@vinforge/templater` package exists
-- [ ] `createTemplater(config)` works with templates, globalData, partials, helpers
-- [ ] `templater.getHTML(templateName, data)` returns HTML or TemplateError
-- [ ] The PUG subset handles elements, classes, IDs, text, dynamic text, nesting (ported from old code)
-- [ ] Handlebars expressions handle variables, globals, helpers, partials
-- [ ] All test cases pass (ported + new)
-- [ ] Can render the "Health Potion" and "Longest Road" examples from the overview doc
+- [x] `@vinforge/templater` package exists
+- [x] `createTemplater(config)` works with templates, globalData, partials, helpers
+- [x] `templater.getHTML(templateName, data)` returns HTML or TemplateError
+- [x] The PUG subset handles elements, classes, IDs, text, dynamic text, nesting (ported from old code)
+- [x] Handlebars expressions handle variables, globals, helpers, partials
+- [x] All test cases pass (ported + new)
+- [x] Can render the "Longest Road" example from the overview doc
+- [ ] Can render the "Health Potion" example (its description needs `{{...}}` in data values, which is after the MVP)
 
 ---
 
