@@ -222,6 +222,19 @@ describe("parseMarkupLines", () => {
 			},
 		},
 		{
+			given: "Windows line endings",
+			when: "parsed",
+			then: "the carriage returns aren't part of the variable or content",
+			input: ".card\r\n\t.title= name\r\n\tHello\r\n",
+			expect: {
+				lines: [
+					{ type: "open" },
+					{ type: "directVar", variable: "name" },
+					{ type: "content", content: "Hello" },
+				],
+			},
+		},
+		{
 			given: "an invalid line after a comment",
 			when: "parsed",
 			then: "the error includes the original line number",
