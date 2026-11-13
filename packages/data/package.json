@@ -1,13 +1,13 @@
 {
-  "name": "@vinforge/data",
-  "version": "0.0.0",
-  "type": "module",
-  "exports": {
-    ".": "./src/index.ts"
-  },
-  "dependencies": {
-    "zod": "^3.25.67",
-    "@vinforge/helpers": "workspace:*",
-    "@vinforge/types": "workspace:*"
-  }
+	"name": "@vinforge/data",
+	"version": "0.0.0",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"dependencies": {
+		"zod": "^3.25.67",
+		"@vinforge/helpers": "workspace:*",
+		"@vinforge/types": "workspace:*"
+	}
 }
