@@ -60,6 +60,16 @@ export const pieceKeySchema = z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/, {
 		"must start with a letter or number, then use only letters, numbers, underscores, or dashes",
 });
 
+// Templates read global data from `_`, so a piece's own `_` would be hidden
+const reservedDataKey = "_";
+
+export const pieceDataSchema = z
+	.record(z.string(), z.any())
+	.refine((data) => !Object.hasOwn(data, reservedDataKey), {
+		message: `"${reservedDataKey}" is reserved for global data`,
+		path: [reservedDataKey],
+	});
+
 export const pieceSchema = z
 	.object({
 		componentType: keyStringSchema,
@@ -67,7 +77,7 @@ export const pieceSchema = z
 		qty: z.number().int().positive().default(1),
 		key: pieceKeySchema.optional(),
 		name: z.string().optional(),
-		data: z.record(z.string(), z.any()).default({}),
+		data: pieceDataSchema.default({}),
 	})
 	.transform((piece, ctx) => {
 		if (piece.key !== undefined) {

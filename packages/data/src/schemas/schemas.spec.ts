@@ -348,6 +348,30 @@ describe("pieceSchema", () => {
 			},
 			expect: { success: false, errorPath: "qty" },
 		},
+		{
+			given: "data with an _ field",
+			when: "parsed",
+			then: "the error points at data._, because _ is reserved for global data",
+			input: {
+				name: "test",
+				componentType: "card",
+				template: "basic",
+				data: { _: { healBig: 50 } },
+			},
+			expect: { success: false, errorPath: "data._" },
+		},
+		{
+			given: "data with a field that starts with _",
+			when: "parsed",
+			then: "it's allowed, because only _ itself is reserved",
+			input: {
+				name: "test",
+				componentType: "card",
+				template: "basic",
+				data: { _private: 1 },
+			},
+			expect: { success: true, data: { data: { _private: 1 } } },
+		},
 	];
 
 	for (const testCase of testCases) {
