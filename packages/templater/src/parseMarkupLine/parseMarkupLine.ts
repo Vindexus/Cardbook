@@ -1,5 +1,6 @@
 import { countAndRemoveIndentation, splitBySpaces } from "@vinforge/helpers";
 import { type MarkupElement, parseElementSelector } from "../elements";
+import { errorMessage } from "../errors";
 
 type LineOpen = {
 	// An element with nothing after it, which can have indented children. Eg ".header"
@@ -123,8 +124,9 @@ export function parseMarkupLines(template: string): NumberedLine[] {
 		try {
 			numberedLines.push({ ...parseMarkupLine(rawLine), lineNumber });
 		} catch (error) {
-			const message = error instanceof Error ? error.message : String(error);
-			throw new Error(`Line ${lineNumber}: ${message}`, { cause: error });
+			throw new Error(`Line ${lineNumber}: ${errorMessage(error)}`, {
+				cause: error,
+			});
 		}
 	});
 

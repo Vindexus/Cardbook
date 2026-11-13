@@ -82,7 +82,10 @@ export function createTemplater(config: TemplaterConfig): Templater {
 	const compileTemplate = (
 		templateName: string,
 	): CompiledTemplate | TemplateError => {
-		const template = config.templates[templateName];
+		// Names come from piece data, so ignore inherited keys like "toString"
+		const template = Object.hasOwn(config.templates, templateName)
+			? config.templates[templateName]
+			: undefined;
 		if (template === undefined) {
 			return {
 				kind: "unknownTemplate",

@@ -198,6 +198,21 @@ describe("createTemplater", () => {
 			},
 		},
 		{
+			given: "a template name that matches a built-in object property",
+			when: "rendered",
+			then: "it returns an unknownTemplate error",
+			input: {
+				config: { templates: {} },
+				render: (templater) => templater.getHTML("toString", {}),
+			},
+			expect: {
+				error: {
+					kind: "unknownTemplate",
+					message: /No template named "toString"/,
+				},
+			},
+		},
+		{
 			given: "invalid markup",
 			when: "rendered",
 			then: "it returns an invalidTemplate error with the line number",
